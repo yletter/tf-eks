@@ -4,17 +4,17 @@ module "vpc" {
   version = "5.4.0"
 
   # VPC Basic Details
-  name = "vpc-dev"
-  cidr = "10.0.0.0/16"   
-  azs                 = ["us-east-1a", "us-east-1b"]
+  name = "vpc-${local.owner}-${local.environment}"
+  cidr = var.cidr_block
+  azs  = var.azs
 
-  public_subnets      = ["10.0.1.0/24", "10.0.2.0/24"]
-  private_subnets     = ["10.0.3.0/24", "10.0.4.0/24"]
+  public_subnets  = var.public_subnets
+  private_subnets = var.private_subnets
 
   # Database Subnets
-  create_database_subnet_group = true
-  create_database_subnet_route_table= true
-  database_subnets    = ["10.0.5.0/24", "10.0.6.0/24"]
+  create_database_subnet_group       = true
+  create_database_subnet_route_table = true
+  database_subnets                   = var.database_subnets
 
   #create_database_nat_gateway_route = true
   #create_database_internet_gateway_route = true
@@ -25,7 +25,7 @@ module "vpc" {
 
   # VPC DNS Parameters
   enable_dns_hostnames = true
-  enable_dns_support = true
+  enable_dns_support   = true
 
   public_subnet_tags = {
     Type = "public-subnets"
@@ -39,14 +39,9 @@ module "vpc" {
     Type = "database-subnets"
   }
 
-  tags = {
-    Owner = "yuvaraj"
-    Environment = "dev"
-  }
+  tags = local.common_tags
 
-  vpc_tags = {
-    Name = "vpc-dev"
-  }
+  vpc_tags = local.vpc_tags
   # Instances launched into the Public subnet should be assigned a public IP address.
   map_public_ip_on_launch = true
 }
