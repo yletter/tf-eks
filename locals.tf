@@ -9,7 +9,7 @@ locals {
   }
   vpc_tags = merge(
     local.common_tags,
-    { Name = local.owner }
+    { Date = "2025-11-25" }
   )
 
 }
