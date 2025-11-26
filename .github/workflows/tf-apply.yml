@@ -53,6 +53,8 @@ jobs:
 
     - name: Terraform Apply
       run: terraform apply --auto-approve tfplan
+      env:
+        TF_VAR_instance_keypair: ${{ secrets.KEYPAIR2025 }}
 
     - name: Archive Terraform Plan
       if: always()

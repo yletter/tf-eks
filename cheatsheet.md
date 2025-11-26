@@ -11,6 +11,8 @@
 * output: description, value | usage module.name.id
 * variable: description, type, default | usage type: string, list(string)
 * vpc module: source, version | terraform-aws-modules/vpc/aws 5.4.0
+* terraform init -migrate-state
+* terraform init -reconfigure
 
 ### VPC
 * name

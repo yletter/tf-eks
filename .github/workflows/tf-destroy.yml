@@ -50,6 +50,8 @@ jobs:
 
     - name: Terraform Destroy
       run: terraform destroy --auto-approve
+      env:
+        TF_VAR_instance_keypair: ${{ secrets.KEYPAIR2025 }}
 
     - name: Archive Terraform Plan
       if: always()
