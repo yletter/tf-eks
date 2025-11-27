@@ -41,6 +41,7 @@ jobs:
         ls -la
         aws s3 ls
         env
+        . ./cleanup.sh
 
     - name: Terraform Init
       run: terraform init
