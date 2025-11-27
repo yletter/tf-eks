@@ -16,5 +16,5 @@ module "ec2_public" {
 variable "instance_keypair" {
   description = "EC2 Key Pair name"
   type        = string
-  default     = "KeyPair2025"
+  default     = "KeyPair2025ppk"
 }
