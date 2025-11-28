@@ -11,8 +11,8 @@ resource "null_resource" "copy_ec2_keys" {
 
 ## File Provisioner: Copies the terraform-key.pem file to /tmp/terraform-key.pem
   provisioner "file" {
-    source      = "cleanup.sh"
-    destination = "/tmp/cleanup.sh"
+    source      = "./key.pem"
+    destination = "/tmp/key.pem"
   }
 ## Remote Exec Provisioner: Using remote-exec provisioner fix the private key permissions on Bastion Host
   provisioner "remote-exec" {
