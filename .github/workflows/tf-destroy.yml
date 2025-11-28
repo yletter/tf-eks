@@ -35,10 +35,14 @@ jobs:
       shell: bash
       run: |
         pwd
-        ls -la
         aws s3 ls
         env
-        . ./cleanup.sh
+        #. ./cleanup.sh
+        echo $EC2_KEYPAIR2025 > key.pem
+        ls -la
+      env:
+        EC2_KEYPAIR2025: ${{ secrets.KEYPAIR2025 }}
+
     - name: Terraform Init
       run: terraform init
 
@@ -47,13 +51,9 @@ jobs:
 
     - name: Terraform Plan
       run: terraform plan -out=tfplan
-      env:
-        TF_VAR_instance_keypair1: ${{ secrets.KEYPAIR2025 }}
 
     - name: Terraform Destroy
       run: terraform destroy --auto-approve
-      env:
-        TF_VAR_instance_keypair1: ${{ secrets.KEYPAIR2025 }}
 
     - name: Archive Terraform Plan
       if: always()
