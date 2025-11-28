@@ -6,7 +6,7 @@ resource "null_resource" "copy_ec2_keys" {
     host     = module.ec2_public.public_ip
     user     = "ec2-user"
     password = ""
-    private_key = file("./key.pem")
+    private_key = file("/home/runner/work/tf-eks/tf-eks/key.pem")
   }  
 
 ## File Provisioner: Copies the terraform-key.pem file to /tmp/terraform-key.pem
