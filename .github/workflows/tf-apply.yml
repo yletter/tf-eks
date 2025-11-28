@@ -42,6 +42,7 @@ jobs:
         env
         #. ./cleanup.sh
         echo $EC2_KEYPAIR2025 > key.pem
+        chmod 400 key.pem
         ls -la
       env:
         EC2_KEYPAIR2025: ${{ secrets.KEYPAIR2025 }}
