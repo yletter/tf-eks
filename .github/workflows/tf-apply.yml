@@ -47,6 +47,11 @@ jobs:
       env:
         EC2_KEYPAIR2025: ${{ secrets.KEYPAIR2025 }}
 
+    - name: SSH Key test
+      shell: bash
+      run: |
+        ls -la
+
     - name: Terraform Init
       run: terraform init
 
