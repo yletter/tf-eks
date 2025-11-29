@@ -13,6 +13,9 @@
 * vpc module: source, version | terraform-aws-modules/vpc/aws 5.4.0
 * terraform init -migrate-state
 * terraform init -reconfigure
+* null_resource
+  - connection
+  - provisioner | file, remote-exec, local-exec
 
 ### VPC
 * name
@@ -23,3 +26,5 @@
 * nat gateway
 * dns hostnames
 * dns support
+
+### EKS
