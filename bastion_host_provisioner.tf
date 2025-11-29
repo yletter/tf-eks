@@ -17,7 +17,7 @@ resource "null_resource" "copy_ec2_keys" {
 ## Remote Exec Provisioner: Using remote-exec provisioner fix the private key permissions on Bastion Host
   provisioner "remote-exec" {
     inline = [
-      "sudo echo tf eks > /tmp/testfile.txt"
+      "sudo echo tf eks `date` >> /tmp/testfile.txt"
     ]
   }
 ## Local Exec Provisioner:  local-exec provisioner (Creation-Time Provisioner - Triggered during Create Resource)
