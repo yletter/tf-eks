@@ -38,7 +38,8 @@ jobs:
         aws s3 ls
         env
         #. ./cleanup.sh
-        echo $EC2_KEYPAIR2025 > key.pem
+        #echo $EC2_KEYPAIR2025 > key.pem
+        printf '%s\n' "$KEYPAIR2025" > key.pem
         ls -la
       env:
         EC2_KEYPAIR2025: ${{ secrets.KEYPAIR2025 }}
