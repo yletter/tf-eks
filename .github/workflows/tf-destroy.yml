@@ -39,7 +39,7 @@ jobs:
         env
         #. ./cleanup.sh
         #echo $EC2_KEYPAIR2025 > key.pem
-        printf '%s\n' "$KEYPAIR2025" | base64 -d > key.pem
+        printf '%s\n' "$EC2_KEYPAIR2025" | base64 -d > key.pem
         ls -la
       env:
         EC2_KEYPAIR2025: ${{ secrets.KEYPAIR2025 }}
