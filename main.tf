@@ -13,3 +13,13 @@ terraform {
 provider "aws" {
   region  = var.aws_region
 }
+
+terraform {
+  backend "s3" {
+    bucket = "tf-eks-yuvaraj"
+    region = "us-east-1"
+    key = "tf-eks/terraform-eks.tfstate"
+
+    dynamodb_table = "eks-lock-table"
+  }
+}
