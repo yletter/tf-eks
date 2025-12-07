@@ -1,11 +1,8 @@
-name: Terraform K8s Apply
+name: Terraform K8s Destroy
 
 on:
-  push:
-    branches:
-      - mainx
   repository_dispatch:
-    types: [trigger-tf-k8s-apply]
+    types: [trigger-tf-k8s-destroy]
   workflow_dispatch:
 
 jobs:
@@ -30,7 +27,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: Location Test 
+    - name: Location Test
       shell: bash
       run: |
         pwd
@@ -45,8 +42,8 @@ jobs:
     - name: Terraform Plan
       run: terraform plan -out=tfplan
 
-    - name: Terraform Apply
-      run: terraform apply --auto-approve tfplan
+    - name: Terraform Destroy
+      run: terraform destroy --auto-approve
 
     - name: Archive Terraform Plan
       if: always()
