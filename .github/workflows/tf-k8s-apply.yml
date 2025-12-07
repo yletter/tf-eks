@@ -1,0 +1,56 @@
+name: Terraform K8s Apply
+
+on:
+  push:
+    branches:
+      - mainx
+  repository_dispatch:
+    types: [trigger-tf-k8s-apply]
+  workflow_dispatch:
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: k8s
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.14.0
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v5
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Location Test 
+      shell: bash
+      run: |
+        pwd
+        ls -la
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan
+
+    - name: Terraform Apply
+      run: #terraform apply --auto-approve tfplan
+
+    - name: Archive Terraform Plan
+      if: always()
+      uses: actions/upload-artifact@v5
+      with:
+        name: tfplan
+        path: terraform/tfplan
