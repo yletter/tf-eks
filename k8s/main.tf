@@ -6,18 +6,38 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 6.21.0"
     }
+    helm = {
+      source = "hashicorp/helm"
+      version = "~> 3.1.1"
+    }
+
+    http = {
+      source = "hashicorp/http"
+      version = "~> 3.5.0"
+    }
+
     kubernetes = {
       source = "hashicorp/kubernetes"
       version = ">= 3.0.0"
     }
   }
 }
+# Terraform HTTP Provider Block
+provider "http" {
+  # Configuration options
+}
 
 # Provider Block
 provider "aws" {
   region  = "us-east-1"
 }
-
+provider "helm" {
+  kubernetes = {
+    host                   = data.terraform_remote_state.eks.outputs.cluster_endpoint
+    cluster_ca_certificate = base64decode(data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data)
+    token                  = data.aws_eks_cluster_auth.cluster.token
+  }
+}
 # Terraform Remote State Datasource - Remote Backend AWS S3
 data "terraform_remote_state" "eks" {
   backend = "s3"
@@ -43,7 +63,7 @@ data "aws_eks_cluster_auth" "cluster" {
 
 # Terraform Kubernetes Provider
 provider "kubernetes" {
-  host = data.terraform_remote_state.eks.outputs.cluster_endpoint 
+  host                   = data.terraform_remote_state.eks.outputs.cluster_endpoint
   cluster_ca_certificate = base64decode(data.terraform_remote_state.eks.outputs.cluster_certificate_authority_data)
-  token = data.aws_eks_cluster_auth.cluster.token
+  token                  = data.aws_eks_cluster_auth.cluster.token
 }
