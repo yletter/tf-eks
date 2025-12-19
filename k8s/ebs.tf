@@ -36,11 +36,11 @@ resource "aws_iam_role" "ebs_csi_iam_role" {
         Effect = "Allow"
         Sid    = ""
         Principal = {
-          Federated = "${aws_iam_openid_connect_provider.oidc_provider.arn}"
+          Federated = "${data.terraform_remote_state.eks.outputs.aws_iam_openid_connect_provider_arn}"
         }
         Condition = {
           StringEquals = {            
-            "${local.aws_iam_oidc_connect_provider_extract_from_arn}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+            "${data.terraform_remote_state.eks.outputs.aws_iam_openid_connect_provider_extract_from_arn}:sub": "system:serviceaccount:kube-system:ebs-csi-controller-sa"
           }
         }
       },
@@ -64,9 +64,9 @@ output "ebs_csi_iam_role_arn" {
 }
 
 # Datasource: EKS Cluster Auth 
-data "aws_eks_cluster_auth" "cluster" {
-  name = aws_eks_cluster.eks_cluster.name
-}
+#data "aws_eks_cluster_auth" "cluster" {
+#  name = data.terraform_remote_state.eks.outputs.cluster_id
+#}
 
 # Install EBS CSI Driver using HELM
 # Resource: Helm Release 
