@@ -37,42 +37,42 @@ resource "kubernetes_deployment_v1" "release" {
 }
 
 # Kubernetes Service Manifest (Type: Load Balancer)
-resource "kubernetes_service_v1" "lb_service" {
-  metadata {
-    name = "release-lb-service"
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment_v1.release.spec.0.selector.0.match_labels.app
-    }
-    port {
-      name        = "http"
-      port        = 80
-      target_port = 80
-    }
-    type = "LoadBalancer"
-  }
-}
+# resource "kubernetes_service_v1" "lb_service" {
+#   metadata {
+#     name = "release-lb-service"
+#   }
+#   spec {
+#     selector = {
+#       app = kubernetes_deployment_v1.release.spec.0.selector.0.match_labels.app
+#     }
+#     port {
+#       name        = "http"
+#       port        = 80
+#       target_port = 80
+#     }
+#     type = "LoadBalancer"
+#   }
+# }
 
 # Kubernetes Service Manifest (Type: Node Port Service)
-resource "kubernetes_service_v1" "np_service" {
-  # count = 0
-  metadata {
-    name = "release-nodeport-service"
-  }
-  spec {
-    selector = {
-      app = kubernetes_deployment_v1.release.spec.0.selector.0.match_labels.app
-    }
-    port {
-      name        = "http"
-      port        = 80
-      target_port = 80
-      node_port   = 31280
-    }
-    type = "NodePort"
-  }
-}
+# resource "kubernetes_service_v1" "np_service" {
+#   # count = 0
+#   metadata {
+#     name = "release-nodeport-service"
+#   }
+#   spec {
+#     selector = {
+#       app = kubernetes_deployment_v1.release.spec.0.selector.0.match_labels.app
+#     }
+#     port {
+#       name        = "http"
+#       port        = 80
+#       target_port = 80
+#       node_port   = 31280
+#     }
+#     type = "NodePort"
+#   }
+# }
 
 # Kubernetes Service Manifest (Type: Load Balancer)
 resource "kubernetes_service_v1" "lb_service_nlb" {
