@@ -22,3 +22,15 @@ output "cluster_id" {
   description = "The name of the EKS Cluster."
   value       = aws_eks_cluster.eks_cluster.name
 }
+
+# VPC CIDR blocks
+output "vpc_cidr_block" {
+  description = "The CIDR block of the VPC"
+  value       = module.vpc.vpc_cidr_block
+}
+
+# VPC Private Subnets
+output "private_subnets" {
+  description = "List of IDs of private subnets"
+  value       = module.vpc.private_subnets
+}
