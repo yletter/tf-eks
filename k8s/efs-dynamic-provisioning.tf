@@ -24,7 +24,6 @@ resource "aws_security_group" "efs_allow_access" {
   }
 }
 
-
 # Resource: EFS File System
 resource "aws_efs_file_system" "efs_file_system" {
   creation_token = "efs-demo"
@@ -42,12 +41,47 @@ resource "aws_efs_mount_target" "efs_mount_target" {
   security_groups = [ aws_security_group.efs_allow_access.id ]
 }
 
+# EFS File System ID
+output "efs_file_system_id" {
+  description = "EFS File System ID"
+  value = aws_efs_file_system.efs_file_system.id 
+}
+
+output "efs_file_system_dns_name" {
+  description = "EFS File System DNS Name"
+  value = aws_efs_file_system.efs_file_system.dns_name
+}
+
+# EFS Mounts Info
+output "efs_mount_target_id" {
+  description = "EFS File System Mount Target ID"
+  value = aws_efs_mount_target.efs_mount_target[*].id 
+}
+
+output "efs_mount_target_dns_name" {
+  description = "EFS File System Mount Target DNS Name"
+  value = aws_efs_mount_target.efs_mount_target[*].mount_target_dns_name 
+}
+
+output "efs_mount_target_availability_zone_name" {
+  description = "EFS File System Mount Target availability_zone_name"
+  value = aws_efs_mount_target.efs_mount_target[*].availability_zone_name 
+}
+
 # Resource: Kubernetes Storage Class
 resource "kubernetes_storage_class_v1" "efs_sc" {  
   metadata {
     name = "efs-sc"
   }
   storage_provisioner = "efs.csi.aws.com"  
+  parameters = {
+    provisioningMode = "efs-ap"
+    fileSystemId =  aws_efs_file_system.efs_file_system.id 
+    directoryPerms = "700"
+    gidRangeStart = "1000" # optional
+    gidRangeEnd = "2000" # optional
+    basePath = "/dynamic_provisioning" # optional
+  }
 }
 
 # Resource: Persistent Volume Claim
@@ -60,7 +94,7 @@ resource "kubernetes_persistent_volume_claim_v1" "efs_pvc" {
     storage_class_name = kubernetes_storage_class_v1.efs_sc.metadata[0].name 
     resources {
       requests = {
-        storage = "1Gi" 
+        storage = "1Gi"
       }
     }
   }
@@ -70,37 +104,10 @@ resource "kubernetes_persistent_volume_claim_v1" "efs_pvc" {
 ## You can specify any size for the persistent volume in the storage field. 
 ## Kubernetes requires this field, but because Amazon EFS is an 
 ## elastic file system, it does not enforce any file system capacity. 
-  
-# Resource: Kubernetes Persistent Volume
-resource "kubernetes_persistent_volume_v1" "efs_pv" {
-  metadata {
-    name = "efs-pv" 
-  }
-  spec {
-    capacity = {
-      storage = "1Gi"
-    }
-    volume_mode = "Filesystem"
-    access_modes = ["ReadWriteMany"]
-    persistent_volume_reclaim_policy = "Retain"
-    storage_class_name = kubernetes_storage_class_v1.efs_sc.metadata[0].name    
-    persistent_volume_source {
-      csi {
-      driver = "efs.csi.aws.com"
-      volume_handle = aws_efs_file_system.efs_file_system.id
-      }
-    }
-  } 
-} 
-
-# Storage Size (storage = "5Gi")
-## You can specify any size for the persistent volume in the storage field. 
-## Kubernetes requires this field, but because Amazon EFS is an 
-## elastic file system, it does not enforce any file system capacity. 
 
 # Resource: Kubernetes Pod - Write to EFS Pod
 resource "kubernetes_pod_v1" "efs_write_app_pod" {
-  depends_on = [ aws_efs_mount_target.efs_mount_target]  
+  depends_on = [ aws_efs_mount_target.efs_mount_target]
   metadata {
     name = "efs-write-app"
   }
@@ -109,14 +116,14 @@ resource "kubernetes_pod_v1" "efs_write_app_pod" {
       name  = "efs-write-app"
       image = "busybox"
       command = ["/bin/sh"]
-      args = ["-c", "while true; do echo EFS Kubernetes Static Provisioning Test $(date -u) >> /data/efs-static.txt; sleep 5; done"]
+      args = ["-c", "while true; do echo EFS Kubernetes Dynamic Provisioning Test $(date -u) >> /data/efs-dynamic.txt; sleep 5; done"]
       volume_mount {
         name = "persistent-storage"
         mount_path = "/data"
       }
-   }
+    }
     volume {
-      name = "persistent-storage"    
+      name = "persistent-storage"
       persistent_volume_claim {
         claim_name = kubernetes_persistent_volume_claim_v1.efs_pvc.metadata[0].name 
       } 
@@ -126,7 +133,7 @@ resource "kubernetes_pod_v1" "efs_write_app_pod" {
 
 # Resource: UserMgmt WebApp Kubernetes Deployment
 resource "kubernetes_deployment_v1" "myapp1" {
-  depends_on = [aws_efs_mount_target.efs_mount_target]  
+  depends_on = [ aws_efs_mount_target.efs_mount_target]
   metadata {
     name = "myapp1"
   }
@@ -155,10 +162,10 @@ resource "kubernetes_deployment_v1" "myapp1" {
             name = "persistent-storage"
             mount_path = "/usr/share/nginx/html/efs"
           }
-        }
-        volume {          
-          name = "persistent-storage"
-          persistent_volume_claim {
+          }
+          volume {          
+            name = "persistent-storage"
+            persistent_volume_claim {
             claim_name = kubernetes_persistent_volume_claim_v1.efs_pvc.metadata[0].name 
           }
         }
@@ -172,7 +179,7 @@ resource "kubernetes_service_v1" "network_lb_service" {
   metadata {
     name = "myapp1-network-lb-service"
     annotations = {
-      "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"
+      "service.beta.kubernetes.io/aws-load-balancer-type" = "nlb"    # To create Network Load Balancer
     }
   }
   spec {
